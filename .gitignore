@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/webapi-with-angular-frontend-auth0/dotnet/Auth0Backend/Auth0Backend/appsettings.Development.json
