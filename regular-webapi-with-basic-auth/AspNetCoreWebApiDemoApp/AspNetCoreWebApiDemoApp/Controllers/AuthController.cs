@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreWebApiDemoApp.DataTransferObjects;
+using AspNetCoreWebApiDemoApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -12,13 +14,12 @@ namespace AspNetCoreWebApiDemoApp.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AuthController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
-            _userManager = userManager;
-            
+            _userManager = userManager;            
         }
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -38,15 +39,17 @@ namespace AspNetCoreWebApiDemoApp.Controllers
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RegisterAsync(string username, string password)
+        public async Task<IActionResult> RegisterAsync(RegisterDto registerDto)
         {
             // Register User using UserManager and return JWT Token
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
-                UserName = username,
-                Email = username
+                UserName = registerDto.Email,
+                Email = registerDto.Email,
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName
             };
-            var result = await _userManager.CreateAsync(user, password);
+            var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (result.Succeeded)
             {
                 var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
